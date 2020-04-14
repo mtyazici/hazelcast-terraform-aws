@@ -1,1 +1,1 @@
-# hazelcast-terraform-quick-start
+# Hazelcast Terraform Quick Start
