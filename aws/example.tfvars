@@ -1,7 +1,4 @@
-# existing key pair name to be assigned to instance
-aws_key_name = "key-pair-name"
-# local path of pem file for SSH connection - local_key_path/aws_key_name.pem
-local_key_path = "/path/to/local/key"
+
 
 # Optional
 member_count = "2"
