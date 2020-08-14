@@ -149,7 +149,7 @@ resource "aws_instance" "hazelcast_member" {
       "cd /home/ubuntu",
       "chmod 0755 start_aws_hazelcast_member.sh",
       "./start_aws_hazelcast_member.sh ${var.hazelcast_version} ${var.hazelcast_aws_version} ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ${var.aws_connection_retries}",
-      "sleep 30",
+      "sleep 20",
       "tail -n 10 ./logs/hazelcast.stdout.log"
     ]
   }
