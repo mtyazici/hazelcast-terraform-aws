@@ -19,10 +19,10 @@ jobs:
         with:
           terraform_version: 0.12.25
 
-      - run: terraform init
+      - run: cd aws && terraform init
 
       - id: plan
-        run: terraform plan -no-color
+        run: cd aws && terraform plan -no-color
 
       - run: echo ${{ steps.plan.outputs.stdout }}
       - run: echo ${{ steps.plan.outputs.stderr }}
