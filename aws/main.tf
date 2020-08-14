@@ -71,11 +71,19 @@ resource "aws_security_group" "sg" {
   }
 
   ingress {
-    from_port   = 5701-5707
-    to_port     = 5701-5707
+    from_port   = 5701
+    to_port     = 5701
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+    ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
   # Allow outgoing traffic to anywhere.
   egress {
@@ -102,7 +110,7 @@ resource "aws_instance" "hazelcast_member" {
   ami                  = data.aws_ami.ubuntu.id
   instance_type        = var.aws_instance_type
   iam_instance_profile = aws_iam_instance_profile.discovery_instance_profile.name
-  # security_groups      = [aws_security_group.sg.name]
+   security_groups      = [aws_security_group.sg.name]
   key_name             = aws_key_pair.keypair.key_name
   tags = {
     Name                 = "Hazelcast-AWS-Member-${count.index + 1}"
@@ -147,51 +155,57 @@ resource "aws_instance" "hazelcast_member" {
   }
 }
 
-# resource "aws_instance" "hazelcast_mancenter" {
-#   ami                  = data.aws_ami.ubuntu.id
-#   instance_type        = var.aws_instance_type
-#   iam_instance_profile = aws_iam_instance_profile.discovery_instance_profile.name
-#    security_groups      = [aws_security_group.sg.name]
-#    key_name             = aws_key_pair.keypair.key_name
-#   tags = {
-#     Name                 = "Hazelcast-AWS-Management-Center"
-#     "${var.aws_tag_key}" = var.aws_tag_value
-#   }
+resource "aws_instance" "hazelcast_mancenter" {
+  ami                  = data.aws_ami.ubuntu.id
+  instance_type        = var.aws_instance_type
+  iam_instance_profile = aws_iam_instance_profile.discovery_instance_profile.name
+   security_groups      = [aws_security_group.sg.name]
+   key_name             = aws_key_pair.keypair.key_name
+  tags = {
+    Name                 = "Hazelcast-AWS-Management-Center"
+    "${var.aws_tag_key}" = var.aws_tag_value
+  }
 
-#   connection {
-#     type        = "ssh"
-#     user        = "ubuntu"
-#     host        = self.public_ip
-#     agent       = false
-#     private_key = file("${var.local_key_path}/${var.aws_key_name}.pem")
-#   }
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = self.public_ip
+    timeout     = "45s"
+    agent       = false
+    private_key = file("${var.local_key_path}/${var.aws_key_name}")
+  }
 
-#   provisioner "file" {
-#     source      = "scripts/start_aws_hazelcast_member.sh"
-#     destination = "/home/ubuntu/start_aws_hazelcast_member.sh"
-#   }
+  provisioner "file" {
+    source      = "scripts/start_aws_hazelcast_management_center.sh"
+    destination = "/home/ubuntu/start_aws_hazelcast_management_center.sh"
+  }
 
-#   provisioner "file" {
-#     source      = "hazelcast.yaml"
-#     destination = "/home/ubuntu/hazelcast.yaml"
-#   }
+  provisioner "file" {
+    source      = "hazelcast-client.yaml"
+    destination = "/home/ubuntu/hazelcast-client.yaml"
+  }
 
-#   provisioner "remote-exec" {
-#     inline = [
-#       "sudo apt-get update",
-#       "sudo apt-get -y install openjdk-8-jdk wget",
-#       "sleep 60"
-#     ]
-#   }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get -y install openjdk-8-jdk wget",
+      "sudo apt install unzip",
+      "sleep 40"
+    ]
+  }
 
-#   provisioner "remote-exec" {
-#     inline = [
-#       "cd /home/ubuntu",
-#       "chmod 0755 start_aws_hazelcast_member.sh",
-#       "./start_aws_hazelcast_member.sh ${var.hazelcast_version} ${var.hazelcast_aws_version} ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ${var.aws_connection_retries}",
-#       "sleep 30",
-#       "tail -n 10 ./logs/hazelcast.stdout.log"
-#     ]
-#   }
-# }
+  provisioner "remote-exec" {
+    inline = [
+      "cd /home/ubuntu",
+      "chmod 0755 start_aws_hazelcast_management_center.sh",
+      "./start_aws_hazelcast_management_center.sh ${var.hazelcast_mancenter_version}  ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ",
+      "sleep 30",
+      #"tail -n 10 ./logs/hazelcast.stdout.log"
+    ]
+  }
+}
 
+output "public_ip2" {
+  value       = aws_instance.hazelcast_mancenter.public_ip
+  description = "The public IP of the Hazelcast MANCENTER"
+}

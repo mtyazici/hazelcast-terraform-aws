@@ -51,5 +51,5 @@ variable "hazelcast_aws_version" {
 
 variable "hazelcast_mancenter_version" {
   type   = string
-  default = "4.0.3"
+  default = "4.2020.08"
 }

@@ -29,3 +29,16 @@ override.tf.json
 # example: *tfplan*
 *credentials*
 .csv
+target/
+.idea/
+.settings/
+.classpath
+.directory
+.project
+.surefire-*
+.DS_Store
+*.iml
+*.ipr
+*.iws
+*.txt
+*.csv

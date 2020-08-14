@@ -5,4 +5,3 @@ hazelcast-client:
       region: AWS-REGION
       tag-key: AWS-TAG-KEY
       tag-value: AWS-TAG-VALUE
-      inside-aws: true
