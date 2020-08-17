@@ -27,31 +27,37 @@ jobs:
       - run: cd aws && terraform init
 
       - name: Terraform Format
-        run: cd aws && terraform fmt -check
+        run: cd aws && terraform fmt 
 
-      - name: ssh keys
-        run: |
-          if [ ! -d "~/.ssh" ]; then
-            mkdir ~/.ssh
-          fi  
-          echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
+      # - name: ssh keys
+      #   run: |
+      #     if [ ! -d "~/.ssh" ]; then
+      #       mkdir ~/.ssh
+      #     fi  
+      #     echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
 
-      
+      - name: Install private key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          name: id_rsa # optional
+
+      - name: Install public key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PUBLIC_KEY }}
+          name: id_rsa.pub # optional
+
       - id: plan
         run: cd aws && terraform plan 
 
       - name: Terraform Apply
         run: |           
-          echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
-          chmod a+r ~/.ssh/id_rsa
-          ls -al ~/.ssh
-          cd ~ && pwd
           cd aws && terraform apply -auto-approve
 
       - name: Terraform Destroy
         if: ${{ always() }}
         run: |
-          echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa  
           cd aws && terraform destroy -auto-approve
 
 
