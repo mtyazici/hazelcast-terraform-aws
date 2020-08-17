@@ -32,7 +32,7 @@ jobs:
         with:
           name: mtyazici/hazelcast-aws
           ref: refs/heads/master
-          token:  ${{ secrets.AWS_GITHUB_TOKEN }}
+          token:  ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
         
       - run: |
           pwd
