@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      -run: |
+      - run: |
         pwd
         ls -al
 
@@ -66,14 +66,14 @@ jobs:
       - id: plan
         run: cd aws && terraform plan 
 
-      - name: Terraform Apply
-        run: |           
-          cd aws && terraform apply -auto-approve
+      # - name: Terraform Apply
+      #   run: |           
+      #     cd aws && terraform apply -auto-approve
 
-      - name: Terraform Destroy
-        if: ${{ always() }}
-        run: |
-          cd aws && terraform destroy -auto-approve
+      # - name: Terraform Destroy
+      #   if: ${{ always() }}
+      #   run: |
+      #     cd aws && terraform destroy -auto-approve
 
 
       # # - run: echo ${{ steps.plan.outputs.stdout }}
