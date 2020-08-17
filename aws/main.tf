@@ -132,6 +132,9 @@ resource "aws_instance" "hazelcast_member" {
         "mkdir -p /home/${var.username}/logs",
         "sudo apt-get update",
         "sudo apt-get -y install openjdk-8-jdk wget",
+        # "cd ",
+        # "wget https://download.java.net/java/GA/jdk9/9.0.4/binaries/openjdk-9.0.4_linux-x64_bin.tar.gz",
+        # "tar -xf openjdk*",
         "sleep 30"
       ]
     }
@@ -147,10 +150,17 @@ resource "aws_instance" "hazelcast_member" {
         destination = "/home/${var.username}/jars/hazelcast-aws.jar"
     }
 
-    provisioner "file" {
-        source      = "~/lib/hazelcast.jar"
-        destination = "/home/${var.username}/jars/hazelcast.jar"
+    provisioner "remote-exec" {
+      inline = [
+        "cd /home/${var.username}/jars",
+        "wget https://oss.sonatype.org/content/repositories/snapshots/com/hazelcast/hazelcast/4.1-SNAPSHOT/hazelcast-4.1-20200817.072207-239.jar",
+        "mv hazelcast-4.1*.jar hazelcast.jar"
+        ]
     }
+    # provisioner "file" {
+    #     source      = "~/lib/hazelcast-4.1-20200817.jar"
+    #     destination = "/home/${var.username}/jars/hazelcast.jar"
+    # }
 
     provisioner "file" {
         source      = "hazelcast.yaml"
@@ -161,6 +171,8 @@ resource "aws_instance" "hazelcast_member" {
   provisioner "remote-exec" {
     inline = [
       "cd /home/${var.username}",
+      # "export JAVA_HOME='/home/${var.username}/jdk-9.0.4'",
+      # "export PATH=$JAVA_HOME/bin:$PATH",
       "chmod 0755 start_aws_hazelcast_member.sh",
       "./start_aws_hazelcast_member.sh  ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ${var.aws_connection_retries}",
       "sleep 20",
@@ -184,7 +196,7 @@ resource "aws_instance" "hazelcast_mancenter" {
     type        = "ssh"
     user        = "ubuntu"
     host        = self.public_ip
-    timeout     = "45s"
+    timeout     = "60s"
     agent       = false
     private_key = file("${var.local_key_path}/${var.aws_key_name}")
   }
