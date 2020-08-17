@@ -36,6 +36,7 @@ jobs:
           fi  
           echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
 
+      
       - id: plan
         run: cd aws && terraform plan 
 
@@ -43,6 +44,8 @@ jobs:
         run: |           
           echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
           chmod a+r ~/.ssh/id_rsa
+          ls -al ~/.ssh
+          cd ~ && pwd
           cd aws && terraform apply -auto-approve
 
       - name: Terraform Destroy
