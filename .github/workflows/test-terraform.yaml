@@ -45,6 +45,7 @@ jobs:
           cd aws && terraform apply -auto-approve
 
       - name: Terraform Destroy
+        if: ${{ always() }}
         run: |
           echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa  
           cd aws && terraform destroy -auto-approve
