@@ -41,7 +41,12 @@ jobs:
           cd aws && terraform apply -auto-approve
 
       - name: Terraform Destroy
-        run: cd aws && terraform destroy -auto-approve
+        run: |
+          if [ ! -d "~/.ssh" ]; then
+            mkdir ~/.ssh
+          fi  
+          echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa  
+          cd aws && terraform destroy -auto-approve
 
 
       # # - run: echo ${{ steps.plan.outputs.stdout }}
