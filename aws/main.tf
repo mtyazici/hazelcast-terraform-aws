@@ -150,17 +150,17 @@ resource "aws_instance" "hazelcast_member" {
         destination = "/home/${var.username}/jars/hazelcast-aws.jar"
     }
 
-    provisioner "remote-exec" {
-      inline = [
-        "cd /home/${var.username}/jars",
-        "wget https://oss.sonatype.org/content/repositories/snapshots/com/hazelcast/hazelcast/4.1-SNAPSHOT/hazelcast-4.1-20200817.072207-239.jar",
-        "mv hazelcast-4.1*.jar hazelcast.jar"
-        ]
-    }
-    # provisioner "file" {
-    #     source      = "~/lib/hazelcast-4.1-20200817.jar"
-    #     destination = "/home/${var.username}/jars/hazelcast.jar"
+    # provisioner "remote-exec" {
+    #   inline = [
+    #     "cd /home/${var.username}/jars",
+    #     "wget https://oss.sonatype.org/content/repositories/snapshots/com/hazelcast/hazelcast/4.1-SNAPSHOT/hazelcast-4.1-20200817.072207-239.jar",
+    #     "mv hazelcast-4.1*.jar hazelcast.jar"
+    #     ]
     # }
+    provisioner "file" {
+        source      = "~/lib/hazelcast-4.1-SNAPSHOT.jar"
+        destination = "/home/${var.username}/jars/hazelcast.jar"
+    }
 
     provisioner "file" {
         source      = "hazelcast.yaml"
