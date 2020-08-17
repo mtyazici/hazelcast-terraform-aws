@@ -23,10 +23,11 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 0.12.25
-      - run: |
-        if [ ! -d "~/.ssh" ]; then
-            mkdir ~/.ssh
-        fi
+      # - run: |
+      #   if [ ! -d "~/.ssh" ]; then
+      #       mkdir ~/.ssh
+      #   fi
+
       - run: echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
 
       - run: cd aws && terraform init
