@@ -10,6 +10,10 @@ variable "local_key_path" {
   default = "~/.ssh/"
 }
 
+variable "username"{
+  default = "ubuntu"
+}
+
 variable "member_count" {
   default = "2"
 }
