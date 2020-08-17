@@ -126,31 +126,45 @@ resource "aws_instance" "hazelcast_member" {
     private_key = file("${var.local_key_path}/${var.aws_key_name}")
   }
 
-  provisioner "file" {
-    source      = "scripts/start_aws_hazelcast_member.sh"
-    destination = "/home/ubuntu/start_aws_hazelcast_member.sh"
-  }
+    provisioner "remote-exec" {
+      inline = [
+        "mkdir -p /home/${var.username}/jars",
+        "mkdir -p /home/${var.username}/logs",
+        "sudo apt-get update",
+        "sudo apt-get -y install openjdk-8-jdk wget",
+        "sleep 30"
+      ]
+    }
 
-  provisioner "file" {
-    source      = "hazelcast.yaml"
-    destination = "/home/ubuntu/hazelcast.yaml"
-  }
+    provisioner "file" {
+      source      = "scripts/start_aws_hazelcast_member.sh"
+      destination = "/home/${var.username}/start_aws_hazelcast_member.sh"
+    }
+
+
+    provisioner "file" {
+        source      = "~/lib/hazelcast-aws.jar"
+        destination = "/home/${var.username}/jars/hazelcast-aws.jar"
+    }
+
+    provisioner "file" {
+        source      = "~/lib/hazelcast.jar"
+        destination = "/home/${var.username}/jars/hazelcast.jar"
+    }
+
+    provisioner "file" {
+        source      = "hazelcast.yaml"
+        destination = "/home/${var.username}/hazelcast.yaml"
+    }
+
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get update",
-      "sudo apt-get -y install openjdk-8-jdk wget",
-      "sleep 60"
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "cd /home/ubuntu",
+      "cd /home/${var.username}",
       "chmod 0755 start_aws_hazelcast_member.sh",
-      "./start_aws_hazelcast_member.sh ${var.hazelcast_version} ${var.hazelcast_aws_version} ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ${var.aws_connection_retries}",
+      "./start_aws_hazelcast_member.sh  ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ${var.aws_connection_retries}",
       "sleep 20",
-      "tail -n 10 ./logs/hazelcast.stdout.log"
+      "tail -n 20 ./logs/hazelcast.stdout.log"
     ]
   }
 }
@@ -190,7 +204,7 @@ resource "aws_instance" "hazelcast_mancenter" {
       "sudo apt-get update",
       "sudo apt-get -y install openjdk-8-jdk wget",
       "sudo apt install unzip",
-      "sleep 40"
+      "sleep 30"
     ]
   }
 
@@ -200,7 +214,7 @@ resource "aws_instance" "hazelcast_mancenter" {
       "chmod 0755 start_aws_hazelcast_management_center.sh",
       "./start_aws_hazelcast_management_center.sh ${var.hazelcast_mancenter_version}  ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ",
       "sleep 30",
-      #"tail -n 10 ./logs/hazelcast.stdout.log"
+      "tail -n 10 ./logs/mancenter.stdout.log"
     ]
   }
 }
