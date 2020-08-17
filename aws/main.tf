@@ -214,7 +214,7 @@ resource "aws_instance" "hazelcast_mancenter" {
       "chmod 0755 start_aws_hazelcast_management_center.sh",
       "./start_aws_hazelcast_management_center.sh ${var.hazelcast_mancenter_version}  ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ",
       "sleep 30",
-      "tail -n 10 ./logs/mancenter.stdout.log"
+      "tail -n 20 ./logs/mancenter.stdout.log"
     ]
   }
 }
