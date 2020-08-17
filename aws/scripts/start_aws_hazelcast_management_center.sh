@@ -28,9 +28,9 @@ pushd ${HOME}/lib
 popd
 
 
-sed -i -e "s/AWS-REGION/${REGION}/g" ${HOME}/hazelcast-client.yaml
-sed -i -e "s/AWS-TAG-KEY/${TAG_KEY}/g" ${HOME}/hazelcast-client.yaml
-sed -i -e "s/AWS-TAG-VALUE/${TAG_VALUE}/g" ${HOME}/hazelcast-client.yaml
+sed -i -e "s/REGION/${REGION}/g" ${HOME}/hazelcast-client.yaml
+sed -i -e "s/TAG-KEY/${TAG_KEY}/g" ${HOME}/hazelcast-client.yaml
+sed -i -e "s/TAG-VALUE/${TAG_VALUE}/g" ${HOME}/hazelcast-client.yaml
 
  
 java -cp ${HOME}/lib/hazelcast-management-center-${MANCENTER_VERSION}.jar com.hazelcast.webmonitor.cli.MCConfCommandLine  cluster add -H ${MAN_CENTER_HOME} --client-config ${HOME}/hazelcast-client.yaml \
