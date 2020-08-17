@@ -23,14 +23,14 @@ jobs:
 
       - name: Checkout Code
         uses: actions/checkout@v2
-          with:
-            path: terraform
+        with:
+          path: terraform
 
       - run: |
           ls -al
           pwd
 
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
         with:
           repository: mtyazici/hazelcast-aws
           ref: refs/heads/master
