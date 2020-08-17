@@ -41,14 +41,14 @@ jobs:
         with:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           name: id_rsa # optional
-          known_hosts: ""
+          known_hosts: " "
 
       - name: Install public key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_PUBLIC_KEY }}
           name: id_rsa.pub # optional
-          known_hosts: ""
+          known_hosts: " "
 
       - id: plan
         run: cd aws && terraform plan 
