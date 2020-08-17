@@ -28,7 +28,7 @@ jobs:
 
       - name: Terraform Format
         run: cd aws && terraform fmt -check
-        
+
       - name: ssh keys
         run: |
           if [ ! -d "~/.ssh" ]; then
@@ -36,24 +36,16 @@ jobs:
           fi  
           echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
 
-
-
       - id: plan
         run: cd aws && terraform plan 
 
       - name: Terraform Apply
         run: |           
-          if [ ! -d "~/.ssh" ]; then
-            mkdir ~/.ssh
-          fi  
           echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
           cd aws && terraform apply -auto-approve
 
       - name: Terraform Destroy
         run: |
-          if [ ! -d "~/.ssh" ]; then
-            mkdir ~/.ssh
-          fi  
           echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa  
           cd aws && terraform destroy -auto-approve
 
