@@ -23,12 +23,6 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 0.12.25
-      - run: |
-          if [ ! -d "~/.ssh" ]; then
-            mkdir ~/.ssh
-          fi
-
-      - run: echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
 
       - run: cd aws && terraform init
 
@@ -39,7 +33,12 @@ jobs:
         run: cd aws && terraform plan 
 
       - name: Terraform Apply
-        run: cd aws && terraform apply -auto-approve
+        run: |           
+          if [ ! -d "~/.ssh" ]; then
+            mkdir ~/.ssh
+          fi  
+          echo ${SSH_PUBLIC_KEY} > ~/.ssh/id_rsa.pub && echo ${SSH_PRIVATE_KEY} > ~/.ssh/id_rsa
+          cd aws && terraform apply -auto-approve
 
       - name: Terraform Destroy
         run: cd aws && terraform destroy -auto-approve
