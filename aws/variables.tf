@@ -1,13 +1,13 @@
 # existing key pair name to be assigned to EC2 instance
 variable "aws_key_name" {
-  type = string
-  default= "id_rsa"
+  type    = string
+  default = "id_rsa"
 }
 
 # local path of pem file for SSH connection - local_key_path/aws_key_name.pem
 variable "local_key_path" {
-  type = string
-  default= "~/.ssh/"
+  type    = string
+  default = "~/.ssh/"
 }
 
 variable "member_count" {
@@ -50,6 +50,6 @@ variable "hazelcast_aws_version" {
 }
 
 variable "hazelcast_mancenter_version" {
-  type   = string
+  type    = string
   default = "4.2020.08"
 }

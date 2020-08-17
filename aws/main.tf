@@ -77,7 +77,7 @@ resource "aws_security_group" "sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-    ingress {
+  ingress {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
@@ -110,7 +110,7 @@ resource "aws_instance" "hazelcast_member" {
   ami                  = data.aws_ami.ubuntu.id
   instance_type        = var.aws_instance_type
   iam_instance_profile = aws_iam_instance_profile.discovery_instance_profile.name
-   security_groups      = [aws_security_group.sg.name]
+  security_groups      = [aws_security_group.sg.name]
   key_name             = aws_key_pair.keypair.key_name
   tags = {
     Name                 = "Hazelcast-AWS-Member-${count.index + 1}"
@@ -159,8 +159,8 @@ resource "aws_instance" "hazelcast_mancenter" {
   ami                  = data.aws_ami.ubuntu.id
   instance_type        = var.aws_instance_type
   iam_instance_profile = aws_iam_instance_profile.discovery_instance_profile.name
-   security_groups      = [aws_security_group.sg.name]
-   key_name             = aws_key_pair.keypair.key_name
+  security_groups      = [aws_security_group.sg.name]
+  key_name             = aws_key_pair.keypair.key_name
   tags = {
     Name                 = "Hazelcast-AWS-Management-Center"
     "${var.aws_tag_key}" = var.aws_tag_value
