@@ -34,10 +34,11 @@ jobs:
         with:
           repository: mtyazici/hazelcast-aws
           ref: refs/heads/master
-          token:  ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          # token:  ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
           path: aws
         
-      - run: |
+      - name: pw
+        run: |
           pwd
           ls -al
 
