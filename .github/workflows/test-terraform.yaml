@@ -24,6 +24,10 @@ jobs:
         with:
           terraform_version: 0.12.25
 
+      - run: |
+          pwd
+          ls -al
+          
       - run: cd aws && terraform init
 
       - name: Terraform Format
