@@ -16,9 +16,18 @@ jobs:
       SSH_PRIVATE_KEY : ${{ secrets.SSH_PRIVATE_KEY }}
     runs-on: ubuntu-latest
     steps:
+
+      -run: |
+        pwd
+        ls -al
+
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      -run: |
+        pwd
+        ls -al
+        
       - name : Set-up Terraform 
         uses: hashicorp/setup-terraform@v1
         with:
@@ -27,7 +36,7 @@ jobs:
       - run: |
           pwd
           ls -al
-          
+
       - run: cd aws && terraform init
 
       - name: Terraform Format
