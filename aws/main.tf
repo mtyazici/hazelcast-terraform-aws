@@ -121,7 +121,7 @@ resource "aws_instance" "hazelcast_member" {
     type        = "ssh"
     user        = "ubuntu"
     host        = self.public_ip
-    timeout     = "45s"
+    timeout     = "180s"
     agent       = false
     private_key = file("${var.local_key_path}/${var.aws_key_name}")
   }
@@ -153,12 +153,13 @@ resource "aws_instance" "hazelcast_member" {
     # provisioner "remote-exec" {
     #   inline = [
     #     "cd /home/${var.username}/jars",
-    #     "wget https://oss.sonatype.org/content/repositories/snapshots/com/hazelcast/hazelcast/4.1-SNAPSHOT/hazelcast-4.1-20200817.072207-239.jar",
+    #     "wget https://oss.sonatype.org/content/repositories/snapshots/com/hazelcast/hazelcast/4.1-SNAPSHOT/hazelcast-4.1-20200818.055653-241.jar",
     #     "mv hazelcast-4.1*.jar hazelcast.jar"
     #     ]
     # }
+
     provisioner "file" {
-        source      = "~/lib/hazelcast-4.1-SNAPSHOT.jar"
+        source      = "~/lib/hazelcast.jar"
         destination = "/home/${var.username}/jars/hazelcast.jar"
     }
 
@@ -196,7 +197,7 @@ resource "aws_instance" "hazelcast_mancenter" {
     type        = "ssh"
     user        = "ubuntu"
     host        = self.public_ip
-    timeout     = "60s"
+    timeout     = "180s"
     agent       = false
     private_key = file("${var.local_key_path}/${var.aws_key_name}")
   }
