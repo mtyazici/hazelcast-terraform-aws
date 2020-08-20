@@ -20,7 +20,7 @@ variable "member_count" {
 
 variable "aws_instance_type" {
   type    = string
-  default = "m1.small"
+  default = "t2.micro"
 }
 
 variable "aws_region" {
@@ -41,16 +41,6 @@ variable "aws_tag_value" {
 variable "aws_connection_retries" {
   type    = string
   default = "3"
-}
-
-variable "hazelcast_version" {
-  type    = string
-  default = "4.0"
-}
-
-variable "hazelcast_aws_version" {
-  type    = string
-  default = "3.1"
 }
 
 variable "hazelcast_mancenter_version" {

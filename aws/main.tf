@@ -1,3 +1,13 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 3.2"
+    }
+  }
+  required_version = ">= 0.13"
+}
+
 provider "aws" {
   region = var.aws_region
 }
@@ -116,7 +126,6 @@ resource "aws_instance" "hazelcast_member" {
     Name                 = "Hazelcast-AWS-Member-${count.index + 1}"
     "${var.aws_tag_key}" = var.aws_tag_value
   }
-
   connection {
     type        = "ssh"
     user        = "ubuntu"
@@ -130,11 +139,9 @@ resource "aws_instance" "hazelcast_member" {
       inline = [
         "mkdir -p /home/${var.username}/jars",
         "mkdir -p /home/${var.username}/logs",
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
         "sudo apt-get update",
         "sudo apt-get -y install openjdk-8-jdk wget",
-        # "cd ",
-        # "wget https://download.java.net/java/GA/jdk9/9.0.4/binaries/openjdk-9.0.4_linux-x64_bin.tar.gz",
-        # "tar -xf openjdk*",
         "sleep 30"
       ]
     }
@@ -144,22 +151,19 @@ resource "aws_instance" "hazelcast_member" {
       destination = "/home/${var.username}/start_aws_hazelcast_member.sh"
     }
 
+    provisioner "file" {
+      source      = "scripts/verify_member_count.sh"
+      destination = "/home/${var.username}/verify_member_count.sh"
+    }
+
 
     provisioner "file" {
         source      = "~/lib/hazelcast-aws.jar"
         destination = "/home/${var.username}/jars/hazelcast-aws.jar"
     }
 
-    # provisioner "remote-exec" {
-    #   inline = [
-    #     "cd /home/${var.username}/jars",
-    #     "wget https://oss.sonatype.org/content/repositories/snapshots/com/hazelcast/hazelcast/4.1-SNAPSHOT/hazelcast-4.1-20200818.055653-241.jar",
-    #     "mv hazelcast-4.1*.jar hazelcast.jar"
-    #     ]
-    # }
-
     provisioner "file" {
-        source      = "~/lib/hazelcast.jar"
+        source      = "~/lib/hazelcast-4.1-20200818.jar"
         destination = "/home/${var.username}/jars/hazelcast.jar"
     }
 
@@ -172,14 +176,22 @@ resource "aws_instance" "hazelcast_member" {
   provisioner "remote-exec" {
     inline = [
       "cd /home/${var.username}",
-      # "export JAVA_HOME='/home/${var.username}/jdk-9.0.4'",
-      # "export PATH=$JAVA_HOME/bin:$PATH",
       "chmod 0755 start_aws_hazelcast_member.sh",
       "./start_aws_hazelcast_member.sh  ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ${var.aws_connection_retries}",
       "sleep 20",
       "tail -n 20 ./logs/hazelcast.stdout.log"
     ]
   }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sleep 10",
+      "cd /home/${var.username}",
+      "chmod 0755 verify_member_count.sh",
+      "sh verify_member_count.sh  ${var.member_count}",
+    ]
+  }
+
 }
 
 resource "aws_instance" "hazelcast_mancenter" {
@@ -191,7 +203,7 @@ resource "aws_instance" "hazelcast_mancenter" {
   tags = {
     Name                 = "Hazelcast-AWS-Management-Center"
     "${var.aws_tag_key}" = var.aws_tag_value
-  }
+  }   
 
   connection {
     type        = "ssh"
@@ -207,6 +219,12 @@ resource "aws_instance" "hazelcast_mancenter" {
     destination = "/home/ubuntu/start_aws_hazelcast_management_center.sh"
   }
 
+
+  provisioner "file" {
+    source      = "scripts/verify_mancenter.sh"
+    destination = "/home/${var.username}/verify_mancenter.sh"
+  }
+
   provisioner "file" {
     source      = "hazelcast-client.yaml"
     destination = "/home/ubuntu/hazelcast-client.yaml"
@@ -214,9 +232,9 @@ resource "aws_instance" "hazelcast_mancenter" {
 
   provisioner "remote-exec" {
     inline = [
+      "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
       "sudo apt-get update",
-      "sudo apt-get -y install openjdk-8-jdk wget",
-      "sudo apt install unzip",
+      "sudo apt-get -y install openjdk-8-jdk wget unzip",
       "sleep 30"
     ]
   }
@@ -226,13 +244,30 @@ resource "aws_instance" "hazelcast_mancenter" {
       "cd /home/ubuntu",
       "chmod 0755 start_aws_hazelcast_management_center.sh",
       "./start_aws_hazelcast_management_center.sh ${var.hazelcast_mancenter_version}  ${var.aws_region} ${var.aws_tag_key} ${var.aws_tag_value} ",
-      "sleep 30",
-      "tail -n 20 ./logs/mancenter.stdout.log"
+      "sleep 20",
+      "tail -n 20 ./logs/mancenter.stdout.log",
     ]
   }
 }
 
-output "public_ip2" {
-  value       = aws_instance.hazelcast_mancenter.public_ip
-  description = "The public IP of the Hazelcast MANCENTER"
+resource "null_resource" "verify_mancenter" {
+
+  depends_on =  [aws_instance.hazelcast_member]
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = aws_instance.hazelcast_mancenter.public_ip
+    timeout     = "180s"
+    agent       = false
+    private_key = file("${var.local_key_path}/${var.aws_key_name}")
+  }
+
+
+  provisioner "remote-exec" {
+  inline = [
+    "cd /home/${var.username}",
+    "chmod 0755 verify_mancenter.sh",
+    "./verify_mancenter.sh  ${var.member_count}",
+  ]
+}
 }
