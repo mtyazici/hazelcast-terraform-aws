@@ -163,7 +163,7 @@ resource "aws_instance" "hazelcast_member" {
     }
 
     provisioner "file" {
-        source      = "~/lib/hazelcast-4.1-20200818.jar"
+        source      = "~/lib/hazelcast.jar"
         destination = "/home/${var.username}/jars/hazelcast.jar"
     }
 
